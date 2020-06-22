@@ -9,7 +9,7 @@
 
             <v-form>
               <v-text-field
-                v-model="firstname"
+                v-model="username"
                 :rules="nameRules"
                 :counter="10"
                 label="Username"
@@ -32,7 +32,8 @@
 
               <v-text-field
                 :rules="[rules.required, rules.min]"
-                :type="password"
+                :type="show ? 'text' : 'password'"
+                v-model="password2"
                 name="input-10-2"
                 label="Retype password"
                 hint="Must match password"
@@ -45,7 +46,7 @@
         <v-card-actions>
           <v-container fluid class="mb-0 py-0">
             <v-row align="center" justify="center">
-              <v-btn block light>REGISTER</v-btn>
+              <v-btn block light @click.stop="Register">REGISTER</v-btn>
             </v-row>
           </v-container>
         </v-card-actions>
@@ -55,17 +56,53 @@
 </template>
 
 <script>
+import axios from "axios";
+axios.defaults.withCredentials = true;
 export default {
   data() {
     return {
       show: false,
-      password: "Password",
+      username: "",
+      password: "",
+      password2: "",
+      email: "",
       rules: {
         required: value => !!value || "Required.",
         min: v => v.length >= 8 || "Min 8 characters",
         emailMatch: () => "The email and password you entered don't match"
       }
     };
+  },
+  created() {
+    if (this.$store.state.token) this.$router.push("/");
+  },
+  methods: {
+    csrf() {
+      return document.cookie
+        .split("; ")
+        .find(row => row.startsWith("csrftoken"))
+        .split("=")[1];
+    },
+    Register() {
+      axios("http://localhost:8000/rest-auth/", {
+        method: "post",
+        data: {
+          username: this.username,
+          email: this.email,
+          password1: this.password,
+          password2: this.password2
+        },
+        headers: {
+          "X-CSRFToken": this.csrf()
+        }
+      })
+        .then(pres => {
+          this.$router.push("/Login");
+        })
+        .catch(error => {
+          console.log(error.response);
+        });
+    }
   }
 };
 </script>

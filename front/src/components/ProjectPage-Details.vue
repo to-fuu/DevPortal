@@ -4,16 +4,16 @@
       <nav-drawer />
       <v-card class="fill-height page-content sharp-card" height="182" outlined>
         <proj-header
-          v-on:SetSubPage="ChangeSubPage"
           :projectname="projectName"
           :categories="categories"
           :key="update"
+          :user="projectOwner"
         />
         <div class="pa-3 pt-5 p-body">
           <div class="mt-3">
             <v-card>
-              <v-card-title>{{projectName}}</v-card-title>
-              <v-card-text>{{projectDesc}}</v-card-text>
+              <v-card-title>{{ projectName }}</v-card-title>
+              <v-card-text>{{ projectDesc }}</v-card-text>
             </v-card>
           </div>
         </div>
@@ -22,7 +22,7 @@
   </div>
 </template>
 
-<style >
+<style>
 .page-content {
   margin-left: 256px;
   overflow-y: scroll;
@@ -36,19 +36,10 @@
 </style>
 
 <script>
-import categorySelect from "./CategorySelect.vue";
-import technologySelect from "./TechnologySelect.vue";
-import gitSource from "./GithubExplorer.vue";
-import editD from "./Edit/TaskDialog.vue";
-
 import axios from "axios";
 
 export default {
-  components: {
-    categorySelect,
-    technologySelect,
-    gitSource
-  },
+  components: {},
   data: () => ({
     page: 1,
     dialog: false,
@@ -62,7 +53,8 @@ export default {
     projectDesc: "",
     categories: [],
     dataFetched: false,
-    update: 0
+    update: 0,
+    projectOwner: {}
   }),
   methods: {
     // Triggered when `childToParent` event is emitted by the child.
@@ -72,7 +64,7 @@ export default {
 
     LoadProject() {
       axios
-        .get("http://127.0.0.1:8000/projects/" + this.$route.params.id)
+        .get("http://localhost:8000/projects/" + this.$route.params.id)
         .then(response => {
           this.repo = response.data.repo;
           this.url = response.data.url;
@@ -85,7 +77,7 @@ export default {
     },
 
     LoadTasks() {
-      axios.get("http://127.0.0.1:8000/tasks/").then(response => {
+      axios.get("http://localhost:8000/tasks/").then(response => {
         const tasks = response.data;
         tasks.forEach(element => {
           if (this.url == element.project) {
@@ -108,7 +100,7 @@ export default {
           "Content-Type": "application/json; charset=utf-8",
           Accept: "application/json"
         },
-        url: "http://127.0.0.1:8000/tasks/",
+        url: "http://localhost:8000/tasks/",
         data: JSON.stringify(postData)
       }).then(this.LoadTasks());
     }

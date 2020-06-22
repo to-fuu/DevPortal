@@ -18,9 +18,14 @@
         @click="select"
         @click:close="remove(item)"
       >
-        <v-avatar class="accent white--text" left v-text="item.slice(0, 1).toUpperCase()"></v-avatar>
+        <v-avatar
+          class="accent white--text"
+          left
+          v-text="item.slice(0, 1).toUpperCase()"
+        ></v-avatar>
 
-        <strong>{{ item }}</strong>&nbsp;
+        <strong>{{ item }}</strong
+        >&nbsp;
       </v-chip>
     </template>
   </v-combobox>

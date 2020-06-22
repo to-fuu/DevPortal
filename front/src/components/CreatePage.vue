@@ -14,8 +14,19 @@
   </div>
 </template>
 
+<script>
+export default {
+  created() {
+    if (this.$store.state.userProfile.userType == 1) this.$router.push("/");
+    if (this.$store.state.userlogged === "") this.$router.push("/");
+  },
+  methods: {
+    //
+  }
+};
+</script>
 
-<style >
+<style>
 .page-content {
   margin-left: 256px;
 }

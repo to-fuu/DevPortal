@@ -3,10 +3,16 @@
     <v-list-item three-line>
       <v-list-item-content class="pl-5">
         <!-- <v-breadcrumbs class="px-0" :items="items"></v-breadcrumbs> -->
-        <v-list-item-subtitle>USERNAME</v-list-item-subtitle>
+        <router-link :to="{ name: 'Profile', params: { id: user.pk } }">
+          <v-list-item-subtitle style="text-transform:uppercase">{{user.username}}</v-list-item-subtitle>
+        </router-link>
+
         <v-list-item-title class="headline font-weight-bold">
-          {{projectname}}
-          <router-link :to="{ name: 'Edit', params: {id: $route.params.id } }">
+          {{ projectname }}
+          <router-link
+            :to="{ name: 'Edit', params: { id: $route.params.id } }"
+            v-if="user.pk == this.$store.state.userlogged.pk"
+          >
             <v-icon small class="pb-4 my-0">mdi-pencil-outline</v-icon>
           </router-link>
         </v-list-item-title>
@@ -16,16 +22,16 @@
     <Searchbar />
 
     <v-card-actions>
-      <v-btn class="topmenu-btn" text :to="{ name: 'Details', params: {id: $route.params.id }}">
+      <v-btn class="topmenu-btn" text :to="{ name: 'Details', params: { id: $route.params.id } }">
         <v-icon small class="mr-1">mdi-information-outline</v-icon>DETAILS
       </v-btn>
-      <v-btn class="topmenu-btn" text :to="{ name: 'Project', params: {id: $route.params.id }}">
+      <v-btn class="topmenu-btn" text :to="{ name: 'Project', params: { id: $route.params.id } }">
         <v-icon small class="mr-1">mdi-code-tags</v-icon>CODE
       </v-btn>
-      <v-btn class="topmenu-btn" text>
+      <v-btn class="topmenu-btn" text :to="{ name: 'Forum', params: { id: $route.params.id } }">
         <v-icon small class="mr-1">mdi-message-outline</v-icon>FORUM
       </v-btn>
-      <v-menu offset-y>
+      <!-- <v-menu offset-y>
         <template v-slot:activator="{ on }">
           <v-btn class="topmenu-btn" text v-on="on">
             <v-icon small class="mr-1">mdi-dots-horizontal</v-icon>More
@@ -36,28 +42,28 @@
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
         </v-list>
-      </v-menu>
+      </v-menu>-->
 
       <v-divider vertical class="mx-2"></v-divider>
 
       <v-chip
-        :v-for="categories!=='undefined'"
+        :v-for="categories !== 'undefined'"
         class="topmenu-chip mx-2"
         v-for="(cat, categories) in categories"
         :key="categories"
         dark
-      >{{cat}}</v-chip>
+      >{{ cat }}</v-chip>
       <!-- <v-chip class="topmenu-chip topmenu-chip-small mx-2" dark>+</v-chip> -->
     </v-card-actions>
   </v-card>
 </template>
 
-<style >
+<style>
 .sharp-card {
   border-radius: 0px;
 }
 .topmenu-btn {
-  width: 96px;
+  min-width: 96px;
 }
 .topmenu-chip {
   width: 96px;
@@ -78,7 +84,7 @@ export default {
   components: {
     Searchbar
   },
-  props: ["projectname", "categories"],
+  props: ["projectname", "categories", "user", "userid"],
   data: () => ({
     items: [
       {

@@ -31,6 +31,7 @@
 import axios from "axios";
 
 export default {
+  props: ["cats"],
   data() {
     return {
       chips: [],
@@ -56,6 +57,8 @@ export default {
     }
   },
   mounted() {
+    console.log(this.cats);
+    this.chips = this.cats.split(" ");
     this.LoadCategories();
   }
 };

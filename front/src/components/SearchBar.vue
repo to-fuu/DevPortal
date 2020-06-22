@@ -11,13 +11,19 @@
       label="Search ..."
       prepend-inner-icon="mdi-magnify"
       class="searchfield"
+      v-model="searchVal"
+      @keydown.enter="search"
     ></v-text-field>
     <v-avatar class="mx-2" height="40" width="40">
-      <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
+      <img v-if="$store.state.userlogged!==''" :src="$store.state.userProfile.photo" alt="John" />
+      <img
+        v-else
+        src="https://developers.google.com/web/images/contributors/no-photo.jpg"
+        alt="nouser"
+      />
     </v-avatar>
   </v-row>
 </template>
-
 
 <style>
 .searchbar {
@@ -39,10 +45,19 @@
 }
 </style>
 
-<script lang="ts">
+<script >
 export default {
-  data: () => ({
-    //
-  })
+  data() {
+    return {
+      searchVal: ""
+    };
+  },
+  methods: {
+    search() {
+      if (this.searchVal == "") return;
+      this.$router.push({ name: "Search", params: { q: this.searchVal } });
+      this.$router.go();
+    }
+  }
 };
 </script>

@@ -75,6 +75,12 @@ export default {
     Toggle() {
       this.dialog = !this.dialog;
     },
+    csrf() {
+      return document.cookie
+        .split("; ")
+        .find(row => row.startsWith("csrftoken"))
+        .split("=")[1];
+    },
     Update() {
       const postData = {
         title: document.getElementById("title").value,
@@ -86,10 +92,13 @@ export default {
         method: "put",
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          Accept: "application/json"
+          Accept: "application/json",
+          "X-CSRFToken": this.csrf()
         },
         url: this.url,
         data: JSON.stringify(postData)
+      }).then(response => {
+        this.$router.go();
       });
     }
   }

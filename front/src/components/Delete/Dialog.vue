@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" max-width="290">
     <v-card>
-      <v-card-title class="headline">Delete {{type}} {{title}} ?</v-card-title>
+      <v-card-title class="headline">Delete {{ type }} {{ title }} ?</v-card-title>
 
       <v-card-text>You cannot undo this action. Continue?</v-card-text>
 
@@ -28,9 +28,27 @@ export default {
     Toggle() {
       this.dialog = !this.dialog;
     },
+    csrf() {
+      return document.cookie
+        .split("; ")
+        .find(row => row.startsWith("csrftoken"))
+        .split("=")[1];
+    },
     DeleteTask() {
-      axios.delete(this.url);
-      this.$router.go();
+      this.url = this.url.replace("my_projects", "projects");
+      axios
+        .delete(this.url, {
+          headers: {
+            "X-CSRFToken": this.csrf()
+          }
+        })
+        .then(response => {
+          console.log(response);
+        });
+      if (this.type == "project") {
+        // this.$router.push("/");
+        // this.$router.go();
+      } else this.$router.go();
     }
   }
 };

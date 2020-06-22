@@ -35,7 +35,7 @@ export default {
   })
 };
 </script>
-<style >
+<style>
 .download {
   background: #34495e !important ;
 }

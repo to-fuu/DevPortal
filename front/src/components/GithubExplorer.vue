@@ -2,14 +2,14 @@
   <v-card class="mx-auto" elevation="4">
     <v-list>
       <v-subheader class>
-        <p class="title">{{fullRepoName}}</p>
+        <p class="title">{{ fullRepoName }}</p>
         <div class="sc-details subtitle">
-          Last update on {{updateDate}}
+          Last update on {{ updateDate }}
           <v-btn dark class="download ml-2" :href="downloadUrl">Download</v-btn>
         </div>
       </v-subheader>
       <v-list-item-group v-model="item" color="primary">
-        <v-list-item link v-if="path!=''" v-on:click="goTo('')">
+        <v-list-item link v-if="path != ''" v-on:click="goTo('')">
           <v-list-item-icon></v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>...</v-list-item-title>
@@ -18,8 +18,8 @@
 
         <v-list-item v-for="(item, i) in files" :key="i" link v-on:click="goTo(item.name)">
           <v-list-item-icon>
-            <v-icon v-text="item.icon" v-if="item.type=='dir'">mdi-folder-outline</v-icon>
-            <v-icon v-text="item.icon" v-if="item.type=='file'">mdi-file-outline</v-icon>
+            <v-icon v-text="item.icon" v-if="item.type == 'dir'">mdi-folder-outline</v-icon>
+            <v-icon v-text="item.icon" v-if="item.type == 'file'">mdi-file-outline</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title v-text="item.name"></v-list-item-title>
@@ -32,6 +32,7 @@
 
 <script>
 import axios from "axios";
+
 export default {
   name: "GithubExplorer",
   props: ["repoRoot", "lastUpdate"],
@@ -54,14 +55,18 @@ export default {
   mounted() {
     console.log(this.repoRoot);
 
-    axios
-      .get("https://api.github.com/repos/" + this.repoRoot)
-      .then(response => {
-        this.fullRepoName = response.data.name;
-        this.downloadUrl = response.data.svn_url + "/archive/master.zip";
-        this.treeUrl = response.data.contents_url.replace("{+path}", "");
-        this.updateDate = response.data.updated_at.substring(0, 10);
+    fetch("https://api.github.com/repos/" + this.repoRoot)
+      .then(res => res.json())
+      .then(res => {
+        this.fullRepoName = res.name;
+        this.downloadUrl = res.svn_url + "/archive/master.zip";
+        this.treeUrl = res.contents_url.replace("{+path}", "");
+        this.updateDate = res.updated_at.substring(0, 10);
         this.getFileTree();
+        console.log(res);
+      })
+      .catch(err => {
+        console.log(err);
       });
   },
   methods: {
@@ -81,9 +86,14 @@ export default {
     },
     getFileTree() {
       if (this.treeUrl.length > 0) {
-        axios.get(this.treeUrl).then(resp => {
-          this.files = resp.data;
-        });
+        fetch(this.treeUrl)
+          .then(res => res.json())
+          .then(res => {
+            this.files = res;
+          })
+          .catch(err => {
+            console.log(err);
+          });
       }
     }
   },
@@ -96,7 +106,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style >
+<style>
 .container {
   width: 100%;
 }

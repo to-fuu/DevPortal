@@ -63,6 +63,12 @@ export default {
   }),
 
   methods: {
+    csrf() {
+      return document.cookie
+        .split("; ")
+        .find(row => row.startsWith("csrftoken"))
+        .split("=")[1];
+    },
     validate() {
       this.$refs.form.validate();
       this.Create();
@@ -74,18 +80,28 @@ export default {
       this.$refs.form.resetValidation();
     },
     Create() {
+      console.log(
+        "http://127.0.0.1:8000/auth/users/" +
+          this.$store.state.userlogged.pk +
+          "/"
+      );
       const postData = {
         repo: document.getElementById("repo").value,
         title: document.getElementById("title").value,
         briefDesc: document.getElementById("bdesc").value,
         detailedDesc: document.getElementById("desc").value,
-        categories: this.$refs.catsRef.GetChips().toString()
+        categories: this.$refs.catsRef.GetChips().toString(),
+        owner:
+          "http://127.0.0.1:8000/auth/users/" +
+          this.$store.state.userlogged.pk +
+          "/"
       };
       axios({
         method: "post",
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          Accept: "application/json"
+          Accept: "application/json",
+          "X-CSRFToken": this.csrf()
         },
         url: "http://127.0.0.1:8000/projects/",
         data: JSON.stringify(postData)

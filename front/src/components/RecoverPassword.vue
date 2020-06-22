@@ -1,12 +1,22 @@
 <template>
   <v-container class="fill-height" fluid style="background: #e2e2e4">
     <v-row align="center" justify="center">
-      <v-card class="mx-auto" max-width="344" elevation="24" dark style="background:#34495e">
+      <v-card
+        class="mx-auto"
+        max-width="344"
+        elevation="24"
+        dark
+        style="background:#34495e"
+      >
         <v-list-item three-line>
           <v-list-item-content>
             <p class="mt-2">Please enter your e-mail</p>
             <v-form>
-              <v-text-field v-model="email" :rules="[rules.required, rules.email]" label="E-mail"></v-text-field>
+              <v-text-field
+                v-model="email"
+                :rules="[rules.required, rules.email]"
+                label="E-mail"
+              ></v-text-field>
             </v-form>
           </v-list-item-content>
         </v-list-item>

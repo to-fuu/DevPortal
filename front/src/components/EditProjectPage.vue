@@ -14,8 +14,7 @@
   </div>
 </template>
 
-
-<style >
+<style>
 .page-content {
   margin-left: 256px;
 }

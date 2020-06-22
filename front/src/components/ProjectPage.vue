@@ -3,20 +3,29 @@
     <v-card height="100%" style="background:#f6f7f9 !important; overflow:hidden !important">
       <nav-drawer />
       <v-card class="fill-height page-content sharp-card" height="182" outlined>
-        <proj-header :projectname="projectName" :categories="categories" :key="update" />
+        <proj-header
+          :projectname="projectName"
+          :categories="categories"
+          :key="update"
+          :user="projectOwner"
+        />
         <div class="pa-3 pt-5 p-body">
           <div v-if="dataFetched">
             <gitSource :repoRoot="repo" />
             <!-- <v-source></v-source> -->
             <br />
-
             <div v-for="(task, t) in tasks" :key="t">
-              <v-task :dataurl="task.url" />
+              <v-task :dataurl="task.url" :projectOwnerId="projectOwner.pk" />
               <br />
             </div>
-
             <br />
-            <v-btn @click.stop="dialog = true" block outlined color="#34495e">New Task</v-btn>
+            <v-btn
+              @click.stop="dialog = true"
+              block
+              outlined
+              color="#34495e"
+              v-if="projectOwner.pk == this.$store.state.userlogged.pk"
+            >New Task</v-btn>
             <v-dialog v-model="dialog" max-width="500" class="pa-3">
               <v-card>
                 <v-card-title class="headline">Add new task</v-card-title>
@@ -82,7 +91,7 @@
   </div>
 </template>
 
-<style >
+<style>
 .page-content {
   margin-left: 256px;
   overflow-y: scroll;
@@ -102,6 +111,7 @@ import gitSource from "./GithubExplorer.vue";
 import editD from "./Edit/TaskDialog.vue";
 
 import axios from "axios";
+// axios.defaults.withCredentials = true;
 
 export default {
   components: {
@@ -121,14 +131,15 @@ export default {
     projectDesc: "",
     categories: [],
     dataFetched: false,
-    update: 0
+    update: 0,
+    projectOwner: {}
   }),
   methods: {
     // Triggered when `childToParent` event is emitted by the child.
 
     LoadProject() {
       axios
-        .get("http://127.0.0.1:8000/projects/" + this.$route.params.id)
+        .get("http://localhost:8000/projects/" + this.$route.params.id)
         .then(response => {
           this.repo = response.data.repo;
           this.url = response.data.url;
@@ -136,12 +147,19 @@ export default {
           this.projectDesc = response.data.detailedDesc;
           if (response.data.categories != null)
             this.categories = response.data.categories.split(",");
+          const split = response.data.owner.split("/");
+          axios
+            .get("http://localhost:8000/users/" + split[split.length - 2])
+            .then(urep => {
+              this.projectOwner = urep.data;
+            });
+
           this.LoadTasks();
         });
     },
 
     LoadTasks() {
-      axios.get("http://127.0.0.1:8000/tasks/").then(response => {
+      axios.get("http://localhost:8000/tasks/").then(response => {
         const tasks = response.data;
         tasks.forEach(element => {
           if (this.url == element.project) {
@@ -164,14 +182,22 @@ export default {
         method: "post",
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          Accept: "application/json"
+          Accept: "application/json",
+          "X-CSRFToken": this.csrf()
         },
-        url: "http://127.0.0.1:8000/tasks/",
+        url: "http://localhost:8000/tasks/",
         data: JSON.stringify(postData)
       }).then(this.LoadTasks());
+    },
+    csrf() {
+      return document.cookie
+        .split("; ")
+        .find(row => row.startsWith("csrftoken"))
+        .split("=")[1];
     }
   },
   mounted() {
+    console.log(this.csrf());
     this.LoadProject();
   }
 };
